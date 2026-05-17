@@ -7,13 +7,30 @@ spring:
   profiles:
     active: local
 
+  boot:
+    admin:
+      ui:
+        title: Themaestrocode Admin Server
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"   # expose all actuator endpoints for SBA
+  endpoint:
+    health:
+      show-details: always
+
 ---
 
 spring:
   config:
     activate:
       on-profile: local
-
+  security:
+    user:
+      name: admin
+      password: admin  # simple credentials fine for local
 
 ---
 
@@ -21,3 +38,16 @@ spring:
   config:
     activate:
       on-profile: prod
+  security:
+    user:
+      name: ${ADMIN_USERNAME}
+      password: ${ADMIN_PASSWORD}
+
+  boot:
+    admin:
+      ui:
+        title: Themaestrocode Admin Server
+      # if clients need to authenticate to register:
+      instance-auth:
+        default-user-name: ${ADMIN_USERNAME}
+        default-password: ${ADMIN_PASSWORD}
