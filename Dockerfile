@@ -1,16 +1,17 @@
 # --- Build Stage ---
-FROM maven:3.9.8-eclipse-temurin-25 AS build
+FROM maven:3.9-eclipse-temurin-25 AS build
 
 WORKDIR /app
 COPY . .
 RUN mvn clean package -DskipTests
 
 # --- Runtime Stage ---
-FROM eclipse-temurin:25
+FROM eclipse-temurin:25-jre
 
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
-EXPOSE 8090
+RUN addgroup --system appgroup && adduser --system --ingroup appgroup appuser
+USER appuser
 
-ENTRYPOINT ["java", "-jar", "app.jar"]
+ENTRYPOINT ["sh", "-c", "java -jar app.jar --server.port=$PORT"]
